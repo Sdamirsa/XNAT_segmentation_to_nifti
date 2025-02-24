@@ -125,12 +125,12 @@ Note: we only have 2.nii as this was the only series that was used for segmentat
 ```
 
 ## 2.0. Installation of libraries 
-> ✅ (code)
+> ✅ ([code](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/InstallDependencies.py))
 
 We will use pydciom to play with .dcm files and nibabel for playing with nifti (.nii) files. 
 
 ## 2.1. Overview of SCANS and ASSESSORS (to facilitate future access) 
-> ✅ (code)
+> ✅ ([code](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/Step_2_1_ParseFolder.py))
 
 At the beginning of execution, we will read the entire folder to create a JSON file containing folder information, including scans info (series UID,  of each folder) and segmentation info (segmentation name defined by the user, date of segmentation, and username of the segmentor for each segmentation folder). Defined in section 2.1. 
 
@@ -157,14 +157,14 @@ We loop through each ASSESSORS folder to:
 Then we will save this a json in the output folder under the same case folder name (for example 2072) with the name Segmentations_info.json
 
 ## 2.2. **\[optional\] Select Validated Segmentations
-> ✅ (code)
+> ✅ ([code](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/Step_2_2_SelectSegmentations.py))
 
 Ask the user if they want to select one segmentation (using the name defined by the segmentor or the name of the segmentation folder). This section doesn't have any guide, as it is clear. 
 
 Optionally, the user can provide a path to an Excel file with a column for case number and a column for a list of segmentation names (this should be a list stored as a string or just one string value). 
 
 ## 2.3. Decoding the single segmentation.dcm
-> ✅ (code)
+> ✅ ([code](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/Step_2_3_DecodeSegmentation.py))
 
 #### Find the segment number for each slice
 
@@ -177,7 +177,7 @@ CAUTION: There is something called referenced SOP instance UID in the per frame 
 
 Hint: loop and create a list.
 
-![alt text](images_of_readme/image-5.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-5.png)
 
 #### Find the ImagePositionPatient (optional but highly recommended)
 
@@ -188,7 +188,7 @@ As I said earlier, I think image position patient would be usable in many scenar
 
 Hint: loop and create a list
 
-![alt text](images_of_readme/image-6.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-6.png)
 
 #### Find the segmentation number to segmentation object names
 
@@ -198,7 +198,7 @@ The DICOM has a section that describes the segmentation name mapping. It maps se
 
 Hint: loop and create a dictionary (1 --> P, which in my case refers to pancreas and the segmentor had known this)
 
-![alt text](images_of_readme/image.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image.png)
 
 #### \[optional\] The recommended color for each segmentation object
 This is the recommended color, which is the one the segmentor used during segmentation. Each segmented object has one of these things. 
@@ -208,7 +208,7 @@ This is the recommended color, which is the one the segmentor used during segmen
 
 Hint: append to the segmentation number to name dictionary
 
-![alt text](images_of_readme/image-4.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-4.png)
 
 #### Find segmentation mask pixel data (images): create a list
 
@@ -218,7 +218,7 @@ All segmentation mask data (pixels of mask image) is stored inside one object wh
 
 Hint: this is already a list
 
-![alt text](images_of_readme/image-2.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-2.png)
 
 #### Find corresponding series in the original image: create a string
 
@@ -236,7 +236,7 @@ Hint: store as string
 
 Hint: loop and create a list
 
-![alt text](images_of_readme/image-1.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-1.png)
 
 #### Name of segmentation defined by the segmentor
 
@@ -245,7 +245,7 @@ Hint: loop and create a list
 
 Hint: store as string
 
-![alt text](images_of_readme/image-3.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-3.png)
 
 #### \[optional but important\] Pixel spacing, slice thickness, space between slices, and Image Orientation Patient
 
@@ -255,7 +255,7 @@ Space between slices shows the space distance between 2D slices to create the 3D
 
 The image orientation patient will demonstrate the orientation of the image (e.g., axial and right to left or ...). It specifies the direction cosines of the first row and the first column with respect to the patient. This is important for 3D visualization of these masks.
 
-![alt text](images_of_readme/image-8.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-8.png)
 
 - (5200,9229) Shared Functional Groups sequence
     - (0020,0037) Image Orientation Patient
@@ -265,7 +265,7 @@ The image orientation patient will demonstrate the orientation of the image (e.g
 
 Hint: store as a dictionary of four lists with float values
 
-![alt text](images_of_readme/image-7.png)
+![alt text](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Images_of_readme/image-6.png)
 
 CAUTION: slice thickness is different than slice spacing, use slice spacing for your 3D visualization or ML usages.
 
@@ -309,8 +309,9 @@ We will store all of the information, along with the specific information of eac
 
 
 ## 2.4 - **Find corresponding series,  create original nifti, create segmentaion nifti**:
-> ✅ (code)
-
+> ✅ ([code for NIFTI](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/Step_2_4_NiftiGeneration.py))
+> ...loading ([code for NRRD ]
+> 
 This section will find the corresponding series in the SCANS folder and storing the original image data of that series as nifti.  Then, turns the previous segmentation pickle to nifti considering the original image slices (for each segmentation object separately). This will generate a segmentation nifti with a unified space (so both original and segmentation niftis would have a similar length/height). 
 
 ### 2.4.1. Find corresponding image series
@@ -319,16 +320,16 @@ Uses the previously prepared selected segmentations (PreparedSegmentations_info.
 
 ### 2.4.2. Create nifti of original CT/MRI images
 
-It will uses Ready2Nifti_info.json to read all .dcm files in series_folder_path and then turn it into nifti file and sotre it in folder (in the same path of json) named Curated_Output. The name of the original CT is the name of the series number that you can understand from the series_folder_path (e.g. the series number of "/Users/as/Downloads/2072/SCANS/1/DICOM" is 1) and it will save it as 1.nii. If there is a previous 1.nii and the overwrite is off it will avoid doing this process again after checking the length of slices. 
+It will use Ready2Nifti_info.json to read all .dcm files in series_folder_path and then turn it into a nifty file and store it in a folder (in the same path of json) named Curated_Output. The name of the original CT is the name of the series number that you can understand from the series_folder_path (e.g., the series number of "/Users/as/Downloads/2072/SCANS/1/DICOM" is 1), and it will save it as 1.nii. If there is a previous 1. nii and the overwrite is off it will avoid doing this process again after checking the length of slices. 
 
 ### 2.4.3. Create nifti of segmentation object
 
-It will uses Ready2Nifti_info to find each segmenation pickle and then, uses the pixel data, pixel spacing, slice spacing, and any other required information to create segmentation nifti files. The nifti file names is like this {refrenced series number}_ON_{object name}__FN_{name of segmentation folder} and if there is a previous nifti with the same length of each object we will avoid overwriting this. Also, consider the length of the nifti as this is a segmentaion of the original CT/MRI and it should have a same dimension. You should remmber the number of slices in the original image and then hanlde this issue by creating empty space for the slices of the original image that doesn't have segmentation. You should use refrenced_instance_UID to find the corresponding slices. You should also do this for each segmentaion object sepratly. 
+It will use Ready2Nifti_info to find each segmentation pickle and then use the pixel data, pixel spacing, slice spacing, and any other required information to create segmentation nifty files. The nifty file names are like this {refrenced series number}_ON_{object name}__FN_{name of segmentation folder} and if there is a previous nifty with the same length of each object, we will avoid overwriting this. Also, consider the length of the night as this is a segmentation of the original CT/MRI, and it should have the same dimension. You should remember the number of slices in the original image and then handle this issue by creating empty space for the slices of the original image that don't have segmentation. You should use refrenced_instance_UID to find the corresponding slices. You should also do this for each segmentation object separately. 
 
 ## 2.5. \[Optional\] Merge (sum) multiple segmentation objects
 > ✅ (code)
 
-This will get a list of objects that it should concatenate. It will read the segmentaiton pickel in the PreparedSegmentations_info.json and add the 2D pixel arrays for any slice that has one or more than one objects defined in the input list of object names, and it will create a new object name, and it will update the counts and segment_name_count in the PreparedSegmentations_info. You should do the Stpe_2_4 again to have this object as .nii. 
+This will get a list of objects that it should concatenate. You should define a merge_plan.json ([see the template here](https://github.com/Sdamirsa/XNAT_segmentation_to_nifti/blob/main/Code/sample_merge_plan.json)). It will read the segmentation pickel in the PreparedSegmentations_info.json and add the 2D-pixel arrays for any slice that has one or more than one objects defined in the input list of object names, and it will create a new object name, and it will update the counts and segment_name_count in the PreparedSegmentations_info. You should do the Stpe_2_4 again to have this object as .nii. 
 
 ---
 
@@ -336,15 +337,15 @@ This will get a list of objects that it should concatenate. It will read the seg
 
 <summary>To do</summary>
 
-- [ ] Add XNAT project hanlder to get the project path, output path, excel file (validated segmentations), and merge_plan.json (for merging multiple objects). 
+- [ ] Add XNAT project handler to get the project path, output path, excel file (validated segmentations), and merge_plan.json (for merging multiple objects). 
 - [ ] Add 2.4. with NRRD support (and .seg.nrrd).
-- [ ] Add the functionality to receive a dictionary of original series UID before uploading to XNAT and the XNAT (current) series UID or series number or folder name.
+- [ ] Add the functionality to receive a dictionary of the original series UID before uploading to XNAT and the XNAT (current) series UID or series number or folder name.
 
 </details> 
 
 ---
 
-*Contact*: You can reach me at sdamirsa@gmail.com for any suggestion to complete this repo. 
+*Contact*: Feel free to reach out to me at sdamirsa@gmail.com with any suggestions for completing this repo. 
 
 
 
