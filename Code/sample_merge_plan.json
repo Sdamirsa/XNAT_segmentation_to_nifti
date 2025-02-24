@@ -1,0 +1,10 @@
+{
+    "merge_plan": {
+      "SEG_20241021_181708_943_S2": [
+        { "old_objects": ["CHA", "SMA", "CA"], "new_object": "Arteries" }
+      ],
+      "all": [
+        { "old_objects": ["MPD", "P", "M"], "new_object": "Pancreas" }
+      ]
+    }
+  }

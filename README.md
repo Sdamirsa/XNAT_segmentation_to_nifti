@@ -37,6 +37,9 @@ The whole solution will get one XNAT folder, structured with a SCANS folder and 
 ├───ASSESSORS
 │   ├───SEG_20240118_235251_213_S2
 │   │   └───SEG
+            each seg file has these files:
+            one SEG_20240118_235251_213_S2.dcm file (with stacked mask objects)
+            one SEG_catalog.xml file 
 │   ├───SEG_20240710_180044_492_S2
 │   │   └───SEG
 │   ├───SEG_20240723_214043_238_S2
@@ -58,6 +61,9 @@ The whole solution will get one XNAT folder, structured with a SCANS folder and 
 └───SCANS
     ├───1
     │   └───DICOM
+                each seg file has these files:
+                each slice stored as one .dcm file so we have mutliple .dcm files
+                there is usually one .xml file like scan_1_catalog.xml with the series UID and slice UID
     ├───2
     │   └───DICOM
     ├───3
@@ -70,6 +76,10 @@ The whole solution will get one XNAT folder, structured with a SCANS folder and 
     │   └───DICOM
     └───603
         └───DICOM
+2073
+    ...
+2074
+    ...
 ```
 
 This code takes a folder path for a study object and stores information in a different output path without modifying or writing information to the original folder. The steps of the solution are:
@@ -89,32 +99,72 @@ The structure of the output folder at the end would be like this:
 ├───Segmentations_info.json
 └───Segmentations
     ├───EN_verified_SN_sdamirsa_SEG_20240118_235251_213_S2
-    │    └───P.pkl
+    │   └───P.pkl
     │   └───G.pkl
-    └───EN_initialAAA_SN_sdamirsa_SEG_20240118_235251_213_S2
+    └───EN_initialAAA_SN_sdamirsa_SEG_20241020_130224_332_S2
         └───P.pkl
         └───M.pkl
         └───MPD.pkl
 └───Curated_Output
-    ├───1.
-
+    ├───2.nii
+    ├───2_ON_P_FN_SEG_20240118_235251_213_S2.nii
+    ├───2_ON_G_FN_SEG_20240118_235251_213_S2.nii
+    ├───2_ON_P_FN_SEG_20241020_130224_332_S2.nii
+    ├───2_ON_M_FN_SEG_20241020_130224_332_S2.nii
+    └───2_ON_MPD_FN_SEG_20241020_130224_332_S2.nii
 
 Note: The segmentations folder include selected segmentations (or all segmentations if haven't defined). Each segmentation folde has a structure of:
-    EN_{the name user defined when exporing/saving}_SN_{username_of_segmentor}_FN_{ segmentaiton folder name}.
+    EN_{the name user defined when exporing/saving}_SN_{username_of_segmentor}_FN_{ segmentaiton folder name}.pkl
 
 Note: P, G, .. is the name of the masks the segmentor defined. 
 
 Note: The name of segmentaiton objects are saved as:
-    ON_{object name}_FN_{name of segmentation folder}
+    {refrenced series number}_ON_{object name}__FN_{name of segmentation folder}
 
+Note: we only have 2.nii as this was the only series that was used for segmentation. 
 ```
 
-## 2.1. Decoding the single segmentation.dcm
-We loop through each SCANS folder to read two random .dcm files (just to be sure) and save the series folder, series number, and series UID. This will be saved as json to faclitate finding the correct series for each, as well as providing the chance to review them manually, if needed.
+## 2.0. Installation of libraries 
+> ✅ (code)
 
+We will use pydciom to play with .dcm files and nibabel for playing with nifti (.nii) files. 
 
+## 2.1. Overview of SCANS and ASSESSORS (to facilitate future access) 
+> ✅ (code)
+
+At the beginning of execution, we will read the entire folder to create a JSON file containing folder information, including scans info (series UID,  of each folder) and segmentation info (segmentation name defined by the user, date of segmentation, and username of the segmentor for each segmentation folder). Defined in section 2.1. 
+
+### 2.1.1 SCANS 
+We loop through each SCANS folder to:
+- read two random .dcm files (just to be sure and doubel check info, and in the case of error print the error in the json for that errorous object and add two values, if they are not similiar) and extrcact and sav:
+    - the series folder path (full)
+    - series number: (0020, 0011) Series Number
+    - series UID: (0020, 0003) Series Instance UID
+    - series description: (0008, 103E) Series description
+    - class UID: (0008, 0016) SOP Class UID
+    
+This will be saved as json (for all folders in the SCANS) to faclitate finding the correct series for each, as well as providing the chance to review them manually, if needed.
+
+### 2.1.1 ASSESSORS 
+Then we will save this a json in the output folder under the same case folder name (for example 2072) with the name StudySeries_info.json
+
+We loop through each ASSESSORS folder to:
+- Find the segmentor name from XML (createdBy object in cat:entries)
+- Find the segmentation was created (createdTime object inside cat:entries)
+- Find the segmentation exported name from the .dcm file ((0008,103E) Series Description)
+- Find the refrenced class SOP UID ((0008,1150) Referenced SOP Class UID) and refrenced series UID .dcm file.
+
+Then we will save this a json in the output folder under the same case folder name (for example 2072) with the name Segmentations_info.json
+
+## 2.2. **\[optional\] Select Validated Segmentations
+> ✅ (code)
+
+Ask the user if they want to select one segmentation (using the name defined by the segmentor or the name of the segmentation folder). This section doesn't have any guide, as it is clear. 
+
+Optionally, the user can provide a path to an Excel file with a column for case number and a column for a list of segmentation names (this should be a list stored as a string or just one string value). 
 
 ## 2.3. Decoding the single segmentation.dcm
+> ✅ (code)
 
 #### Find the segment number for each slice
 
@@ -125,7 +175,7 @@ The first thing to read is the information of each slice we have in the .dcm fil
 
 CAUTION: There is something called referenced SOP instance UID in the per frame functional groups sequence. THIS IS NOT THE UID OF THE ORIGINAL SLICE OF THE CT SCAN OR MRI.
 
-Hint: loop and create a list
+Hint: loop and create a list.
 
 ![alt text](images_of_readme/image-5.png)
 
@@ -243,6 +293,42 @@ This is the dimension of each 2D slice (mask image).
 
 Hint: store as dictionary with integer values
 
+#### Finally
+
+We will store all of the information, along with the specific information of each mask inside different pickles in a folder named Segmentations inside a folder with the same name as the case folder name (structure defined below) files as pickle files. 
+
+2072
+└───Segmentations
+    ├───EN_verified_SN_sdamirsa_SEG_20240118_235251_213_S2
+    │   └───P.pkl
+    │   └───G.pkl
+    └───EN_initialAAA_SN_sdamirsa_SEG_20241020_130224_332_S2
+        └───P.pkl
+        └───M.pkl
+        └───MPD.pkl
+
+
+## 2.4 - **Find corresponding series,  create original nifti, create segmentaion nifti**:
+> ✅ (code)
+
+This section will find the corresponding series in the SCANS folder and storing the original image data of that series as nifti.  Then, turns the previous segmentation pickle to nifti considering the original image slices (for each segmentation object separately). This will generate a segmentation nifti with a unified space (so both original and segmentation niftis would have a similar length/height). 
+
+### 2.4.1. Find corresponding image series
+
+Uses the previously prepared selected segmentations (PreparedSegmentations_info.json) and use ref_series_uid to find the corresponding folder using the study series info (StudySeries_info.json) using it's series_uid. Created an updated version of PreparedSegmentations_info with the corresponding series info (as a new dictionary of each selected segmentation) and save it as Ready2Nifti_info.json.
+
+### 2.4.2. Create nifti of original CT/MRI images
+
+It will uses Ready2Nifti_info.json to read all .dcm files in series_folder_path and then turn it into nifti file and sotre it in folder (in the same path of json) named Curated_Output. The name of the original CT is the name of the series number that you can understand from the series_folder_path (e.g. the series number of "/Users/as/Downloads/2072/SCANS/1/DICOM" is 1) and it will save it as 1.nii. If there is a previous 1.nii and the overwrite is off it will avoid doing this process again after checking the length of slices. 
+
+### 2.4.3. Create nifti of segmentation object
+
+It will uses Ready2Nifti_info to find each segmenation pickle and then, uses the pixel data, pixel spacing, slice spacing, and any other required information to create segmentation nifti files. The nifti file names is like this {refrenced series number}_ON_{object name}__FN_{name of segmentation folder} and if there is a previous nifti with the same length of each object we will avoid overwriting this. Also, consider the length of the nifti as this is a segmentaion of the original CT/MRI and it should have a same dimension. You should remmber the number of slices in the original image and then hanlde this issue by creating empty space for the slices of the original image that doesn't have segmentation. You should use refrenced_instance_UID to find the corresponding slices. You should also do this for each segmentaion object sepratly. 
+
+## 2.5. \[Optional\] Merge (sum) multiple segmentation objects
+> ✅ (code)
+
+This will get a list of objects that it should concatenate. It will read the segmentaiton pickel in the PreparedSegmentations_info.json and add the 2D pixel arrays for any slice that has one or more than one objects defined in the input list of object names, and it will create a new object name, and it will update the counts and segment_name_count in the PreparedSegmentations_info. You should do the Stpe_2_4 again to have this object as .nii. 
 
 ---
 
@@ -250,6 +336,7 @@ Hint: store as dictionary with integer values
 
 <summary>To do</summary>
 
+- [ ] Add 2.4. with NRRD support (and .seg.nrrd).
 - [ ] Add the functionality to receive a dictionary of original series UID before uploading to XNAT and the XNAT (current) series UID or series number or folder name.
 
 </details> 
