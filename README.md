@@ -336,6 +336,7 @@ This will get a list of objects that it should concatenate. It will read the seg
 
 <summary>To do</summary>
 
+- [ ] Add XNAT project hanlder to get the project path, output path, excel file (validated segmentations), and merge_plan.json (for merging multiple objects). 
 - [ ] Add 2.4. with NRRD support (and .seg.nrrd).
 - [ ] Add the functionality to receive a dictionary of original series UID before uploading to XNAT and the XNAT (current) series UID or series number or folder name.
 
